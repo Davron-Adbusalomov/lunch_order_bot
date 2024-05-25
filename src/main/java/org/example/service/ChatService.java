@@ -27,12 +27,6 @@ public class ChatService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Autowired
-    private EmployeeService employeeService;
-
-    @Autowired
-    private MealService mealService;
-
-    @Autowired
     private OrderService orderService;
 
     TelegramConfig telegramConfig = new TelegramConfig(this);
@@ -62,7 +56,6 @@ public class ChatService {
                     if (msg.matches("\\d+")) {
                         int code = Integer.parseInt(msg);
                         Employee employee = restTemplate.getForObject("http://localhost:8080/FoodBookingAssignment_war/api/employees/getEmployeeByCode/" + code, Employee.class);
-                        //Employee employee = employeeService.getEmployeeByCode(code);
                         sendMessage.setText("Xurmatli, " + employee.getLastName() + " " + employee.getFirstName() + ", bugungi taomnoma bilan tanishish uchun menuni oling❕");
 
                         ChatSessionState.setId(chatId, employee.getId());
