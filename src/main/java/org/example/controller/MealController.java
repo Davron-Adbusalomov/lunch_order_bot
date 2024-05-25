@@ -5,6 +5,7 @@ import org.example.model.Meal;
 import org.example.service.EmployeeService;
 import org.example.service.MealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,10 +18,10 @@ public class MealController {
     @Autowired
     private MealService mealService;
 
-    @GetMapping("getMealByWeekDay/{weekDay}")
-    public List<Meal> getMealByWeekDay(@PathVariable DayOfWeek weekDay) throws Exception {
+    @GetMapping(value = "getMealByWeekDay/{weekDay}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Meal> getMealByWeekDay(@PathVariable("weekDay") DayOfWeek weekDay) throws Exception {
         try {
-            return mealService.getMealsByWeekDay(weekDay);
+            return mealService.getByWeekDay(weekDay);
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }

@@ -10,6 +10,8 @@ public class OrderStatistics {
         this.mealId=mealId;
     }
 
+    public OrderStatistics(){}
+
     public int getEmployeeId(){
         return employeeId;
     }

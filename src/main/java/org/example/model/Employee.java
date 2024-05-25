@@ -1,5 +1,7 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Employee {
     private int id;
 
@@ -14,6 +16,9 @@ public class Employee {
         this.firstName = firstName;
         this.lastName = lastName;
         this.code = code;
+    }
+
+    public Employee() {
     }
 
     public int getId(){

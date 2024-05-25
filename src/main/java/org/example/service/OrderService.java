@@ -1,36 +1,60 @@
 package org.example.service;
 
+import org.example.config.DatabaseConfig;
 import org.example.model.Order;
 import org.example.model.OrderStatistics;
-import org.example.repoImpl.EmployeeRepoImpl;
-import org.example.repoImpl.OrderRepoImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Repository
 public class OrderService {
     @Autowired
-    private OrderRepoImpl orderRepo;
+    private DatabaseConfig databaseConfig;
 
-    @Autowired
-    private EmployeeRepoImpl employeeRepo;
+    private static final String ASSIGN_LUNCH_TO_EMPLOYEE = "INSERT INTO employee_meal (employee_id, meal_id) VALUES (?, ?)";
 
-    public void assignMeals(Order order) throws SQLException {
-        try{
-            orderRepo.orderMeal(order);
-        }catch (Exception e){
-            throw new SQLException("Meals could not be ordered!");
+    private static final String GET_ORDER_STATISTICS = "SELECT * FROM employee_meal ";
+
+    public String orderMeal(Order order) throws Exception {
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(ASSIGN_LUNCH_TO_EMPLOYEE)) {
+
+            for (Integer mealId : order.getMeals_id()) {
+                statement.setInt(1, order.getEmployee_id());
+                statement.setInt(2, mealId);
+                statement.executeUpdate();
+            }
+
+            return "success";
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new Exception("Cannot be saved");
         }
     }
 
-    public List<OrderStatistics> getStatistics() throws Exception {
-        try {
-            return orderRepo.getStatistics();
-        }catch (Exception e){
-            throw new Exception("Sorry statistics are not available yet!");
+    public List<OrderStatistics> getStatistics(){
+        List<OrderStatistics> orderStatisticsList = new ArrayList<>();
+        OrderStatistics orderStatistics;
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_ORDER_STATISTICS)){
+            try(ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()){
+                    orderStatistics = new OrderStatistics(resultSet.getInt(1),
+                            resultSet.getInt(2));
+                    orderStatisticsList.add(orderStatistics);
+                }
+                return orderStatisticsList;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

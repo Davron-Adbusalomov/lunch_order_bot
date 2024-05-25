@@ -5,6 +5,7 @@ import org.example.model.Order;
 import org.example.model.OrderStatistics;
 import org.example.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -16,16 +17,16 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/recordOrder")
+    @PostMapping(value = "/recordOrder", produces = MediaType.APPLICATION_JSON_VALUE)
     public void recordLunchOrder(Order order) throws Exception {
         try {
-            orderService.assignMeals(order);
+            orderService.orderMeal(order);
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
 
-    @GetMapping("/getStatistics")
+    @GetMapping(value = "/getStatistics", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<OrderStatistics> getEmployeeByCode() throws Exception {
         try {
             return orderService.getStatistics();

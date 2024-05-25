@@ -1,26 +1,62 @@
 package org.example.service;
 
+import org.example.config.DatabaseConfig;
 import org.example.enums.WeekDays;
 import org.example.model.Meal;
-import org.example.repoImpl.MealRepoImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
-@Service
-public class MealService {
-
+@Repository
+public class MealService{
     @Autowired
-    private MealRepoImpl mealRepo;
+    private DatabaseConfig databaseConfig;
 
-    public List<Meal> getMealsByWeekDay(DayOfWeek weekDay){
-        List<Meal> meals = mealRepo.getByWeekDay(weekDay);
-        if (meals.isEmpty()){
-            throw new NoSuchElementException("Bugun uchun ovqatlar yo'q uzr!");
+    private static final String GET_ALL_MEALS = "SELECT * FROM meal";
+
+    private static final String GET_MEAL_BY_WEEKDAY = "SELECT * FROM meal WHERE weekday = ?";
+
+    public List<Meal> getAll() {
+        List<Meal> resultList = new ArrayList<>();
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(GET_ALL_MEALS)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultList.add(new Meal(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            WeekDays.valueOf(rs.getString(4))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return meals;
+        return resultList;
+    }
+
+    public List<Meal> getByWeekDay(DayOfWeek weekDay) throws Exception {
+        List<Meal> resultList = new ArrayList<>();
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(GET_MEAL_BY_WEEKDAY)) {
+            ps.setString(1, weekDay.name());
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultList.add(new Meal(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            WeekDays.valueOf(rs.getString(4))));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("No Food found for this day!");
+        }
+        return resultList;
     }
 }

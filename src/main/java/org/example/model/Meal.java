@@ -18,6 +18,9 @@ public class Meal {
         this.weekDay = weekDay;
     }
 
+    public Meal() {
+    }
+
     public int getId() {
         return id;
     }
