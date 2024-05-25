@@ -46,6 +46,10 @@ public class ChatService {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
 
+        if (msg.equals("/start")) {
+            ChatSessionState.setState(String.valueOf(chatId), ChatState.START);
+        }
+
         ChatState step = ChatSessionState.STATE_MAP.getOrDefault(String.valueOf(chatId),ChatState.START);
         Integer id = ChatSessionState.ID_MAP.getOrDefault(chatId, null);
 
@@ -53,28 +57,35 @@ public class ChatService {
         switch (step) {
             case START:
                 if (msg.equals("/start")) {
-                    sendMessage.setText("Assalomu alaykum. LunchBotga xush kelibsiz! Iltimos identifikatsiya kodini kiriting:");
+                    sendMessage.setText("Assalomu alaykum. LunchBotga xush kelibsiz!\nIltimos identifikatsiya kodini kiriting:");
                     telegramConfig.execute(sendMessage);
                     ChatSessionState.setState(String.valueOf(chatId), ChatState.CODE_VALIDATION);
                 }
                 break;
             case CODE_VALIDATION:
                 try {
-                    int code = Integer.parseInt(msg);
-                    //  Employee employee = restTemplate.getForObject("http://localhost:8080/employees/getEmployeeByCode/" + code, Employee.class);
-                    Employee employee = employeeService.getEmployeeByCode(code);
-                    sendMessage.setText("Xurmatli, " + employee.getLastName() + " " + employee.getFirstName() + ", bugungi taomnoma bilan tanishish uchun menuni oling!");
+                    if (msg.matches("\\d+")) {
+                        int code = Integer.parseInt(msg);
+                        //  Employee employee = restTemplate.getForObject("http://localhost:8080/employees/getEmployeeByCode/" + code, Employee.class);
+                        Employee employee = employeeService.getEmployeeByCode(code);
+                        sendMessage.setText("Xurmatli, " + employee.getLastName() + " " + employee.getFirstName() + ", bugungi taomnoma bilan tanishish uchun menuni oling❕");
 
-                    ChatSessionState.setId(chatId, employee.getId());
+                        ChatSessionState.setId(chatId, employee.getId());
 
-                    List<String> buttonLabels = new ArrayList<>();
-                    buttonLabels.add("Menuni olish");
-                    sendMessage.setReplyMarkup(createInlineKeyboardMarkup(buttonLabels));
+                        List<String> buttonLabels = new ArrayList<>();
+                        buttonLabels.add("Menuni olish");
+                        sendMessage.setReplyMarkup(ButtonsService.createInlineKeyboardMarkup(buttonLabels));
 
-                    telegramConfig.execute(sendMessage);
+                        telegramConfig.execute(sendMessage);
+                    }else {
+                        sendMessage.setText("Code faqat raqamlardan iborat bo'lishi kerak❗ Iltimos o'z kodingizni kiriting!");
+                        telegramConfig.execute(sendMessage);
+                        return;
+                    }
                 } catch (Exception e) {
                     sendMessage.setText("Xatolik yuz berdi: " + e.getMessage());
                     telegramConfig.execute(sendMessage);
+                    return;
                 }
                 ChatSessionState.setState(String.valueOf(chatId), ChatState.ASK_MENU);
                 break;
@@ -107,13 +118,14 @@ public class ChatService {
                         List<String> buttonLabels = new ArrayList<>();
                         buttonLabels.add("Ha");
                         buttonLabels.add("Yo'q");
-                        sendMessage.setReplyMarkup(createInlineKeyboardMarkup(buttonLabels));
+                        sendMessage.setReplyMarkup(ButtonsService.createInlineKeyboardMarkup(buttonLabels));
 
                         telegramConfig.execute(sendMediaGroup);
                         telegramConfig.execute(sendMessage);
                     }catch (Exception e){
                         sendMessage.setText(e.getMessage());
                         telegramConfig.execute(sendMessage);
+                        return;
                     }
                 }
                 ChatSessionState.setState(String.valueOf(chatId), ChatState.BOOK_LUNCH);
@@ -130,13 +142,21 @@ public class ChatService {
                         }
                         order.setMeals_id(meal_ids);
                         orderService.assignMeals(order);
-                        sendMessage.setText("Siz muvaffaqqiyatli buyurtma berdingiz! Quyida tugma orqali bugungi buyurtmalar statistikasini olishingiz mumkin!");
-                        sendMessage.setReplyMarkup(createReplyKeyboardMarkup("Statistikani olish"));
+                        sendMessage.setText("Siz muvaffaqqiyatli buyurtma berdingiz!✅\nQuyida tugma orqali bugungi buyurtmalar statistikasini olishingiz mumkin!");
+                        sendMessage.setReplyMarkup(ButtonsService.createReplyKeyboardMarkup("Statistikani olish"));
                         telegramConfig.execute(sendMessage);
                     }catch (Exception e){
                         sendMessage.setText(e.getMessage());
                         telegramConfig.execute(sendMessage);
                     }
+                } else if (msg.equals("Yo'q")) {
+                    sendMessage.setText("Xo'p, buyurtmani keyinroq berishingiz mumkin!👌👌👌");
+                    telegramConfig.execute(sendMessage);
+                    return;
+                } else {
+                    sendMessage.setText("Iltimos tugmalardan birini tanlang!");
+                    telegramConfig.execute(sendMessage);
+                    return;
                 }
                 ChatSessionState.setState(String.valueOf(chatId), ChatState.ASK_STATISTICS);
                 break;
@@ -147,41 +167,12 @@ public class ChatService {
                         stringBuilder.append(orderStatistics.getEmployeeId()).append(" ").append(orderStatistics.getMealId()).append("\n");
                     }
                     sendMessage.setText(stringBuilder.toString());
+                }else {
+                    sendMessage.setText("Xato input kiritdingiz❗❌");
+                    telegramConfig.execute(sendMessage);
+                    return;
                 }
                 telegramConfig.execute(sendMessage);
-
         }
-    }
-
-    private InlineKeyboardMarkup createInlineKeyboardMarkup(List<String> buttonLabels) {
-        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
-
-        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-        List<InlineKeyboardButton> rowInline = new ArrayList<>();
-
-        for (String label : buttonLabels) {
-            InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
-            inlineKeyboardButton.setText(label);
-            inlineKeyboardButton.setCallbackData(label);
-            rowInline.add(inlineKeyboardButton);
-        }
-
-        rowsInline.add(rowInline);
-        markupInline.setKeyboard(rowsInline);
-
-        return markupInline;
-    }
-
-    private ReplyKeyboardMarkup createReplyKeyboardMarkup(String buttonLabel) {
-        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        List<KeyboardRow> keyboardRowList = new ArrayList<>();
-        KeyboardRow keyboardRow = new KeyboardRow();
-        KeyboardButton keyboardButton = new KeyboardButton();
-        keyboardButton.setText(buttonLabel);
-        keyboardRow.add(keyboardButton);
-        keyboardRowList.add(keyboardRow);
-        replyKeyboardMarkup.setKeyboard(keyboardRowList);
-
-        return replyKeyboardMarkup;
     }
 }
