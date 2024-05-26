@@ -18,7 +18,7 @@ public class MealController {
     @Autowired
     private MealService mealService;
 
-    @GetMapping(value = "getMealByWeekDay/{weekDay}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getMealByWeekDay/{weekDay}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Meal> getMealByWeekDay(@PathVariable("weekDay") DayOfWeek weekDay) throws Exception {
         try {
             return mealService.getByWeekDay(weekDay);

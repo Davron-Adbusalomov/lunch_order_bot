@@ -23,7 +23,7 @@ public class OrderService {
 
     private static final String GET_ORDER_STATISTICS = "SELECT * FROM employee_meal ";
 
-    public String orderMeal(Order order) throws Exception {
+    public void orderMeal(Order order) throws Exception {
         try (Connection connection = databaseConfig.dataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(ASSIGN_LUNCH_TO_EMPLOYEE)) {
 
@@ -33,7 +33,6 @@ public class OrderService {
                 statement.executeUpdate();
             }
 
-            return "success";
         } catch (SQLException e) {
             throw new Exception("Saqlashda xatolik yuz berdi!");
         }

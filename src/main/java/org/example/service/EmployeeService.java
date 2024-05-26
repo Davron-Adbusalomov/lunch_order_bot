@@ -41,7 +41,7 @@ public class EmployeeService {
     }
 
     public Employee getEmployeeByCode(int code) throws Exception {
-        Employee employee = null;
+        Employee employee;
         try (Connection connection = databaseConfig.dataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(GET_EMPLOYEE_BY_CODE)) {
             ps.setInt(1, code);
