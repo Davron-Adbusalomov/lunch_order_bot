@@ -1,6 +1,9 @@
 package org.example.service;
 
 import org.example.config.TelegramConfig;
+import org.example.controller.EmployeeController;
+import org.example.controller.MealController;
+import org.example.controller.OrderController;
 import org.example.enums.ChatSessionState;
 import org.example.enums.ChatState;
 import org.example.model.Employee;
@@ -24,10 +27,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ChatService {
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private EmployeeController employeeController;
 
     @Autowired
-    private OrderService orderService;
+    private MealController mealController;
+
+    @Autowired
+    private OrderController orderController;
 
     TelegramConfig telegramConfig = new TelegramConfig(this);
 
@@ -55,7 +62,7 @@ public class ChatService {
                 try {
                     if (msg.matches("\\d+")) {
                         int code = Integer.parseInt(msg);
-                        Employee employee = restTemplate.getForObject("http://localhost:8080/FoodBookingAssignment_war/api/employees/getEmployeeByCode/" + code, Employee.class);
+                        Employee employee = employeeController.getEmployeeByCode(code);
                         sendMessage.setText("Xurmatli, " + employee.getLastName() + " " + employee.getFirstName() + ", bugungi taomnoma bilan tanishish uchun menuni oling❕");
 
                         ChatSessionState.setId(chatId, employee.getId());
@@ -80,7 +87,7 @@ public class ChatService {
             case ASK_MENU:
                 if(msg.equals("Menuni olish")){
                     try {
-                        List<Meal> meals = getMealsByWeekDay();
+                        List<Meal> meals = mealController.getMealByWeekDay(LocalDateTime.now().getDayOfWeek());
                         SendMediaGroup sendMediaGroup = new SendMediaGroup();
                         List<InputMedia> mediaList = new ArrayList<>();
 
@@ -125,11 +132,11 @@ public class ChatService {
                         order.setEmployee_id(id);
 
                         List<Integer> meal_ids = new ArrayList<>();
-                        for (Meal meal:getMealsByWeekDay()){
+                        for (Meal meal:mealController.getMealByWeekDay(LocalDateTime.now().getDayOfWeek())){
                             meal_ids.add(meal.getId());
                         }
                         order.setMeals_id(meal_ids);
-                        orderService.orderMeal(order);
+                        orderController.recordLunchOrder(order);
                         sendMessage.setText("Siz muvaffaqqiyatli buyurtma berdingiz!✅\nQuyida tugma orqali bugungi buyurtmalar statistikasini olishingiz mumkin!");
                         sendMessage.setReplyMarkup(ButtonsService.createReplyKeyboardMarkup("Statistikani olish"));
                         telegramConfig.execute(sendMessage);
@@ -151,16 +158,16 @@ public class ChatService {
             case ASK_STATISTICS:
                 if (msg.equals("Statistikani olish")){
                     try {
-                        ResponseEntity<List<OrderStatistics>> response = restTemplate.exchange(
-                                "http://localhost:8080/FoodBookingAssignment_war/api/orders/getStatistics",
-                                org.springframework.http.HttpMethod.GET,
-                                null,
-                                new ParameterizedTypeReference<List<OrderStatistics>>() {}
-                        );
+                        List<OrderStatistics> orderStatistics = orderController.getStatistics();
+                        if (orderStatistics.isEmpty()){
+                            sendMessage.setText("e.getMessage()");
+                            telegramConfig.execute(sendMessage);
+                            return;
+                        }
 
                         StringBuilder stringBuilder = new StringBuilder();
-                        for (OrderStatistics orderStatistics: response.getBody()){
-                            stringBuilder.append(orderStatistics.getEmployeeId()).append(" ").append(orderStatistics.getMealId()).append("\n");
+                        for (OrderStatistics orderStatistic: orderStatistics){
+                            stringBuilder.append(orderStatistic.getEmployeeId()).append(" ").append(orderStatistic.getMealId()).append("\n");
                         }
                         sendMessage.setText(stringBuilder.toString());
                     }catch (Exception e){
@@ -174,15 +181,5 @@ public class ChatService {
                 }
                 telegramConfig.execute(sendMessage);
         }
-    }
-
-    private List<Meal> getMealsByWeekDay() {
-        ResponseEntity<List<Meal>> response = restTemplate.exchange(
-                "http://localhost:8080/FoodBookingAssignment_war/api/getMealByWeekDay/" + LocalDateTime.now().getDayOfWeek(),
-                org.springframework.http.HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Meal>>() {}
-        );
-        return response.getBody();
     }
 }

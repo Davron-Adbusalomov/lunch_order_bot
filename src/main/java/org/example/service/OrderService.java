@@ -35,8 +35,7 @@ public class OrderService {
 
             return "success";
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new Exception("Cannot be saved");
+            throw new Exception("Saqlashda xatolik yuz berdi!");
         }
     }
 
@@ -54,7 +53,7 @@ public class OrderService {
                 return orderStatisticsList;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+                throw new RuntimeException("Ma'lumotlar bazasiga ulanishda xatolik yuz berdi!");
         }
     }
 }

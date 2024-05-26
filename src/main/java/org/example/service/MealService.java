@@ -45,17 +45,20 @@ public class MealService{
         List<Meal> resultList = new ArrayList<>();
         try (Connection connection = databaseConfig.dataSource().getConnection();
              PreparedStatement ps = connection.prepareStatement(GET_MEAL_BY_WEEKDAY)) {
-            ps.setString(1, weekDay.name());
-            try (ResultSet rs = ps.executeQuery()) {
+             ps.setString(1, weekDay.name());
+             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     resultList.add(new Meal(rs.getInt(1),
                             rs.getString(2),
                             rs.getString(3),
                             WeekDays.valueOf(rs.getString(4))));
                 }
-            }
+                if (resultList.isEmpty()) {
+                    throw new Exception("Bugun uchun hech qanday taom topilmadi!");
+                }
+             }
         } catch (SQLException e) {
-            throw new Exception("No Food found for this day!");
+            throw new Exception("Ma'lumotlar bazasiga ulanishda xatolik yuz berdi!");
         }
         return resultList;
     }

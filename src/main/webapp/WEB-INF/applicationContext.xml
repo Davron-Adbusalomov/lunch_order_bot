@@ -8,7 +8,4 @@
 
     <context:component-scan base-package="org.example" />
 
-    <!-- Define RestTemplate bean -->
-    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
-
 </beans>

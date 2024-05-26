@@ -51,10 +51,12 @@ public class EmployeeService {
                             rs.getString(2),
                             rs.getString(3),
                             rs.getInt(4));
+                } else {
+                    throw new Exception("Bu nomerdagi ishchi topilmadi!");
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Could not find employee!");
+            throw new Exception("Ma'lumotlar bazasiga ulanishda xatolik yuz berdi!");
         }
         return employee;
     }
