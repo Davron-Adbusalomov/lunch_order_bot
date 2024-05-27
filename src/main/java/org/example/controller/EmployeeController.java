@@ -20,4 +20,13 @@ public class EmployeeController {
             throw new Exception(e.getMessage());
         }
     }
+
+    @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Employee getEmployeeById(int employeeId) throws Exception {
+        try {
+            return employeeService.getEmployeeById(employeeId);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
 }

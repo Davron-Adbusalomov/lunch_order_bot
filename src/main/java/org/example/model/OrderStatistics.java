@@ -3,11 +3,17 @@ package org.example.model;
 public class OrderStatistics {
     private int employeeId;
 
+    private String employeeName;
+
     private int mealId;
 
-    public OrderStatistics(Integer employeeId, Integer mealId){
+    private String mealName;
+
+    public OrderStatistics(Integer employeeId, Integer mealId, String employeeName, String mealName){
         this.employeeId=employeeId;
         this.mealId=mealId;
+        this.employeeName=employeeName;
+        this.mealName=mealName;
     }
 
     public OrderStatistics(){}
@@ -26,6 +32,22 @@ public class OrderStatistics {
 
     public void setMealId(int mealId) {
         this.mealId = mealId;
+    }
+
+    public String getEmployeeName() {
+        return employeeName;
+    }
+
+    public void setEmployeeName(String employeeName) {
+        this.employeeName = employeeName;
+    }
+
+    public String getMealName() {
+        return mealName;
+    }
+
+    public void setMealName(String mealName) {
+        this.mealName = mealName;
     }
 
 

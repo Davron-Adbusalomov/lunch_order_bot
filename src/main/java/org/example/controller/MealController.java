@@ -26,4 +26,13 @@ public class MealController {
             throw new Exception(e.getMessage());
         }
     }
+
+    public Meal getMealById(int mealId) {
+        try {
+            return mealService.getMealById(mealId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

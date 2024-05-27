@@ -19,6 +19,12 @@ public class OrderService {
     @Autowired
     private DatabaseConfig databaseConfig;
 
+    @Autowired
+    private MealService mealService;
+
+    @Autowired
+    private EmployeeService employeeService;
+
     private static final String ASSIGN_LUNCH_TO_EMPLOYEE = "INSERT INTO employee_meal (employee_id, meal_id) VALUES (?, ?)";
 
     private static final String GET_ORDER_STATISTICS = "SELECT * FROM employee_meal ";
@@ -46,10 +52,15 @@ public class OrderService {
             try(ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()){
                     orderStatistics = new OrderStatistics(resultSet.getInt(1),
-                            resultSet.getInt(2));
+                            resultSet.getInt(2),
+                            employeeService.getEmployeeById(resultSet.getInt(1)).getFirstName(),
+                            mealService.getMealById(resultSet.getInt(2)).getName()
+                    );
                     orderStatisticsList.add(orderStatistics);
                 }
                 return orderStatisticsList;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
                 throw new RuntimeException("Ma'lumotlar bazasiga ulanishda xatolik yuz berdi!");

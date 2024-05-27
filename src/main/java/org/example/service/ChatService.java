@@ -157,14 +157,16 @@ public class ChatService {
                     try {
                         List<OrderStatistics> orderStatistics = orderController.getStatistics();
                         if (orderStatistics.isEmpty()){
-                            sendMessage.setText("e.getMessage()");
+                            sendMessage.setText("Hozircha hech qanday buyurtma qilinmagan❗❌");
                             telegramConfig.execute(sendMessage);
                             return;
                         }
 
                         StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append(String.format("%-30s %-20s%n", "Employee", "Meal"));
+                        stringBuilder.append("------------------------------------------------------------\n");
                         for (OrderStatistics orderStatistic: orderStatistics){
-                            stringBuilder.append(orderStatistic.getEmployeeId()).append(" ").append(orderStatistic.getMealId()).append("\n");
+                            stringBuilder.append(String.format("%-30s %-20s%n", orderStatistic.getEmployeeId()+"("+orderStatistic.getEmployeeName()+")", orderStatistic.getMealId()+"("+orderStatistic.getMealName()+")"));
                         }
                         sendMessage.setText(stringBuilder.toString());
                     }catch (Exception e){

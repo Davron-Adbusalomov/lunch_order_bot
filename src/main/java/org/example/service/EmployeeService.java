@@ -22,6 +22,8 @@ public class EmployeeService {
 
     private static final String GET_EMPLOYEE_BY_CODE = "SELECT * FROM employee WHERE code = ?";
 
+    private static final String GET_EMPLOYEE_BY_ID = "SELECT * FROM employee WHERE id = ?";
+
     public List<Employee> getAll() {
         List<Employee> resultList = new ArrayList<>();
         try (Connection connection = databaseConfig.dataSource().getConnection();
@@ -61,4 +63,24 @@ public class EmployeeService {
         return employee;
     }
 
+    public Employee getEmployeeById(int employeeId) throws Exception {
+        Employee employee = null;
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(GET_EMPLOYEE_BY_ID)) {
+            ps.setInt(1, employeeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    employee = new Employee(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            rs.getInt(4));
+                }else {
+                    throw new Exception("Bu IDdagi ishchi topilmadi!");
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Ma'lumotlar bazasiga ulanishda xatolik yuz berdi!");
+        }
+        return employee;
+    }
 }
