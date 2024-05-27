@@ -19,29 +19,29 @@ public class MealService{
     @Autowired
     private DatabaseConfig databaseConfig;
 
-//    private static final String GET_ALL_MEALS = "SELECT * FROM meal";
+    private static final String GET_ALL_MEALS = "SELECT * FROM meal";
 
     private static final String GET_MEAL_BY_WEEKDAY = "SELECT * FROM meal WHERE weekday = ?";
 
     private static final String GET_MEAL_BY_ID = "SELECT * FROM meal WHERE id = ?";
 
-//    public List<Meal> getAll() {
-//        List<Meal> resultList = new ArrayList<>();
-//        try (Connection connection = databaseConfig.dataSource().getConnection();
-//             PreparedStatement ps = connection.prepareStatement(GET_ALL_MEALS)) {
-//            try (ResultSet rs = ps.executeQuery()) {
-//                while (rs.next()) {
-//                    resultList.add(new Meal(rs.getInt(1),
-//                            rs.getString(2),
-//                            rs.getString(3),
-//                            WeekDays.valueOf(rs.getString(4))));
-//                }
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return resultList;
-//    }
+    public List<Meal> getAll() {
+        List<Meal> resultList = new ArrayList<>();
+        try (Connection connection = databaseConfig.dataSource().getConnection();
+             PreparedStatement ps = connection.prepareStatement(GET_ALL_MEALS)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    resultList.add(new Meal(rs.getInt(1),
+                            rs.getString(2),
+                            rs.getString(3),
+                            WeekDays.valueOf(rs.getString(4))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return resultList;
+    }
 
     public List<Meal> getByWeekDay(DayOfWeek weekDay) throws Exception {
         List<Meal> resultList = new ArrayList<>();

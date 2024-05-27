@@ -7,13 +7,13 @@ import java.util.HashMap;
 
 
 public class ChatSessionState {
-    public static final HashMap<String, ChatState> STATE_MAP = new HashMap<>();
+    public static final HashMap<Long, ChatState> STATE_MAP = new HashMap<>();
 
-    public static ChatState getState(String chatId) {
+    public static ChatState getState(Long chatId) {
         return STATE_MAP.get(chatId);
     }
 
-    public static void setState(String chatId, ChatState state) {
+    public static void setState(Long chatId, ChatState state) {
         STATE_MAP.put(chatId, state);
     }
 

@@ -40,10 +40,10 @@ public class ChatService {
         sendMessage.setChatId(chatId);
 
         if (msg.equals("/start")) {
-            ChatSessionState.setState(String.valueOf(chatId), ChatState.START);
+            ChatSessionState.setState(chatId, ChatState.START);
         }
 
-        ChatState step = ChatSessionState.STATE_MAP.getOrDefault(String.valueOf(chatId),ChatState.START);
+        ChatState step = ChatSessionState.STATE_MAP.getOrDefault(chatId,ChatState.START);
         Integer id = ChatSessionState.ID_MAP.getOrDefault(chatId, null);
 
 
@@ -52,7 +52,7 @@ public class ChatService {
                 if (msg.equals("/start")) {
                     sendMessage.setText("Assalomu alaykum. LunchBotga xush kelibsiz!\nIltimos identifikatsiya kodini kiriting:");
                     telegramConfig.execute(sendMessage);
-                    ChatSessionState.setState(String.valueOf(chatId), ChatState.CODE_VALIDATION);
+                    ChatSessionState.setState(chatId, ChatState.CODE_VALIDATION);
                 }
                 break;
             case CODE_VALIDATION:
@@ -79,7 +79,7 @@ public class ChatService {
                     telegramConfig.execute(sendMessage);
                     return;
                 }
-                ChatSessionState.setState(String.valueOf(chatId), ChatState.ASK_MENU);
+                ChatSessionState.setState(chatId, ChatState.ASK_MENU);
                 break;
             case ASK_MENU:
                 if(msg.equals("Menuni olish")){
@@ -120,7 +120,7 @@ public class ChatService {
                         return;
                     }
                 }
-                ChatSessionState.setState(String.valueOf(chatId), ChatState.BOOK_LUNCH);
+                ChatSessionState.setState(chatId, ChatState.BOOK_LUNCH);
                 break;
             case BOOK_LUNCH:
                 if (msg.equals("Ha")){
@@ -150,7 +150,7 @@ public class ChatService {
                     telegramConfig.execute(sendMessage);
                     return;
                 }
-                ChatSessionState.setState(String.valueOf(chatId), ChatState.ASK_STATISTICS);
+                ChatSessionState.setState(chatId, ChatState.ASK_STATISTICS);
                 break;
             case ASK_STATISTICS:
                 if (msg.equals("Statistikani olish")){
