@@ -1,7 +1,6 @@
 package org.example.service;
 
 import org.example.config.DatabaseConfig;
-import org.example.enums.WeekDays;
 import org.example.model.Meal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,7 +33,7 @@ public class MealService{
                     resultList.add(new Meal(rs.getInt(1),
                             rs.getString(2),
                             rs.getString(3),
-                            WeekDays.valueOf(rs.getString(4))));
+                            DayOfWeek.valueOf(rs.getString(4))));
                 }
             }
         } catch (SQLException e) {
@@ -53,7 +52,7 @@ public class MealService{
                     resultList.add(new Meal(rs.getInt(1),
                             rs.getString(2),
                             rs.getString(3),
-                            WeekDays.valueOf(rs.getString(4))));
+                            DayOfWeek.valueOf(rs.getString(4))));
                 }
                 if (resultList.isEmpty()) {
                     throw new Exception("Bugun uchun hech qanday taom topilmadi!");
@@ -74,7 +73,7 @@ public class MealService{
                     return new Meal(rs.getInt(1),
                             rs.getString(2),
                             rs.getString(3),
-                            WeekDays.valueOf(rs.getString(4)));
+                            DayOfWeek.valueOf(rs.getString(4)));
                 }
                 else {
                     throw new SQLException("Bu id bilan taom topilmadi!");

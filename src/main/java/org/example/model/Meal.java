@@ -1,6 +1,6 @@
 package org.example.model;
 
-import org.example.enums.WeekDays;
+import java.time.DayOfWeek;
 
 public class Meal {
     private int id;
@@ -9,9 +9,9 @@ public class Meal {
 
     private String image;
 
-    private WeekDays weekDay;
+    private DayOfWeek weekDay;
 
-    public Meal(int id, String name, String image, WeekDays weekDay) {
+    public Meal(int id, String name, String image, DayOfWeek weekDay) {
         this.id = id;
         this.name = name;
         this.image = image;
@@ -19,6 +19,14 @@ public class Meal {
     }
 
     public Meal() {
+    }
+
+    public DayOfWeek getWeekDay() {
+        return weekDay;
+    }
+
+    public void setWeekDay(DayOfWeek weekDay) {
+        this.weekDay = weekDay;
     }
 
     public int getId() {
@@ -45,11 +53,5 @@ public class Meal {
         this.image = image;
     }
 
-    public WeekDays getWeekDay() {
-        return weekDay;
-    }
 
-    public void setWeekDay(WeekDays weekDay) {
-        this.weekDay = weekDay;
-    }
 }

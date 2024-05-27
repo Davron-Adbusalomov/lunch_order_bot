@@ -12,7 +12,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
-    @GetMapping(value = "/getEmployeeByCode/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Employee getEmployeeByCode(@PathVariable("code") int code) throws Exception {
         try {
             return employeeService.getEmployeeByCode(code);
@@ -21,12 +21,4 @@ public class EmployeeController {
         }
     }
 
-    @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Employee getEmployeeById(int employeeId) throws Exception {
-        try {
-            return employeeService.getEmployeeById(employeeId);
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
 }
